@@ -8,24 +8,38 @@
 //            shutter and a start button
 //****************************************************************
 
-#include "LEDArray.cpp"
-
-
+#include <LEDArray.h>
+#define NB_LEDS 8
+LEDArray ledArray;
 
 void setup() {
   //set pins to output so you can control the shift register
   Serial.begin(9600);
- // ledArray();
+  pinMode(0, OUTPUT);
+  digitalWrite(0,LOW);
+  pinMode(5,INPUT);
+
+  ledArray.setNbLEDs(NB_LEDS);
 
 }
 void loop() {
 
-byte whichLED = 0x00;
-for(size_t i = 0; i <8; i++)
+if(digitalRead(5)){
+
+byte ledState = 0x00;
+for(size_t i = 0; i <NB_LEDS; i++)
 {
-  whichLED = (whichLED << 1) + 0b01;
-  
+  ledState = (ledState << 1) + 0b01;
+  ledArray.setLedsState(ledState);
   delay(300);
+}
+digitalWrite(0,HIGH);
+delay(100);
+digitalWrite(0,LOW);
+delay(100);
+digitalWrite(0,HIGH);
+delay(100);
+digitalWrite(0,LOW);
 }
 
 }
@@ -34,6 +48,7 @@ for(size_t i = 0; i <8; i++)
 
 SIGNAL(TIMER0_COMPA_vect) 
 {
+  ledArray.ledCycle();
  
 
 
