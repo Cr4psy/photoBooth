@@ -38,17 +38,22 @@ void loop() {
     uint16_t ledState = 0x00;
     for(size_t i = 0; i <NB_LEDS; i++)
     {
-      ledState = (ledState << 1) + 0b01;
-      ledArray.setLedsState(ledState);
-      if ((i+1)%16 == 0){
-        tone(SPEAKER_PIN, NOTE_A4);
-        photo();
-      } else if ((i+1)%4==0) {
+      ledState = (ledState >> 1) + (0b01<<(NB_LEDS-1));
+      ledArray.setLedsState(leftRotate(ledState,1));
+      
+      if ((i+1)%5==0) {
         tone(SPEAKER_PIN,NOTE_A3);
-      }      
-      delay(300);
+      }
+
+      delay(200);
       noTone(SPEAKER_PIN);
     }
+    ledArray.setLedsState(0);
+    delay(600);
+    ledArray.setLedsState(0xFFFF);
+    tone(SPEAKER_PIN, NOTE_A4);
+    photo();
+    noTone(SPEAKER_PIN);
     ledArray.setLedsState(0);
   }
 
@@ -74,7 +79,7 @@ void photo(){
   digitalWrite(CAMERA_FOCUS_PIN, LOW);
   digitalWrite(CAMERA_SHUTTER_PIN, LOW);
 
-  delay(300);
+  delay(200);
   
   digitalWrite(CAMERA_FOCUS_PIN, HIGH);
   digitalWrite(CAMERA_SHUTTER_PIN, HIGH);
@@ -85,14 +90,19 @@ void photo(){
   
 }
 
+uint16_t leftRotate(uint16_t n, unsigned int d) 
+{ 
+   return (n << d)|(n >> (16 - d)); 
+} 
+
+int rightRotate(int n, unsigned int d) 
+{ 
+   return (n >> d)|(n << (16 - d)); 
+} 
 
 volatile int I = 0;
 SIGNAL(TIMER0_COMPA_vect) 
 {
-  if(I == 1){
    ledArray.ledCycle();
-    I = 0;
-  }
-  I++;
 } 
 
