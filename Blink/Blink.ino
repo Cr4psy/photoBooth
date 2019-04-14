@@ -33,14 +33,14 @@ void setup() {
 void loop() {
 
 
- if (fallingEdge(BUTTON_PIN) || true){
+ if (fallingEdge(BUTTON_PIN)){
 
     uint16_t ledState = 0x00;
     for(size_t i = 0; i <NB_LEDS; i++)
     {
-      ledState = (ledState >> 1) + (0b01<<(NB_LEDS-1));
+      ledState |= 0b01 << ((NB_LEDS-1) - i);
       ledArray.setLedsState(leftRotate(ledState,1));
-      
+
       if ((i+1)%5==0) {
         tone(SPEAKER_PIN,NOTE_A3);
       }
@@ -100,7 +100,6 @@ int rightRotate(int n, unsigned int d)
    return (n >> d)|(n << (16 - d)); 
 } 
 
-volatile int I = 0;
 SIGNAL(TIMER0_COMPA_vect) 
 {
    ledArray.ledCycle();
